@@ -1,1 +1,38 @@
 
+{
+  "env": "development",
+  "version": "1.0.0",
+
+  "siteTitle": "Pacta Tua - DDine aftaler",
+  "supportEmail": "kontakt@ziczac.dk",
+  "supportPhone": "+45 12 34 56 78",
+  "welcomeImageUrl": "https://ziczac.dk/vorthold/shared/images/hold_velkomst.jpg", 
+
+  "baseUrl": "https://ziczac.dk/vorthold/",
+  "adminPath": "admin/",
+  "deltagerPath": "deltager/",
+  "sharedPath": "shared/",
+
+  "api": {
+    "baseUrl": "https://ziczac.dk/vorthold/api/",
+    "endpoints": {
+      "tilmelding": "tilmelding.php",
+      "fremmoede": "fremmoede.php",
+      "deltagere": "deltagere.php",
+      "oekonomi": "oekonomi.php"
+    }
+  },
+
+  "features": {
+    "enableMessengerLink": true,
+    "enablePdfExport": true,
+    "enableQrFremmoede": true,
+    "enableKalenderICS": true
+  },
+
+  "defaults": {
+    "aktivitetsVaerdi": 0,
+    "egenbetaling": 0,
+    "maxDeltagere": 20
+  }
+}
