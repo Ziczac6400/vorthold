@@ -1,1 +1,117 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rediger velkomstindhold</title>
+  <link rel="stylesheet" href="/vorthold/shared/style/main.css" />
+    
+</head>
+<body>
+  <h1>🎨 Rediger velkomstindhold</h1>
 
+  <form id="velkomst-form">
+    <label for="overskrift">Overskrift:</label>
+    <input type="text" id="overskrift" name="overskrift" placeholder="F.eks. Fællesskab og bevægelse" required />
+
+    <label for="beskrivelse">Beskrivelse:</label>
+    <textarea id="beskrivelse" name="beskrivelse" rows="4" placeholder="Beskrivelse af velkomstindholdet" required></textarea>
+
+    <label for="beskrivelse2">Footer tekst:</label>
+    <textarea id="beskrivelse2" name="beskrivelse2" rows="4" placeholder="Beskrivelse af footer tekst" required></textarea>
+
+    <label for="billede_url">Billed-URL:</label>
+    <input type="text" id="billede_url" name="billede_url" placeholder="Link til billede" />
+    <img id="preview" src="" alt="Billede preview" />
+    <br>
+    <button type="submit">Gem ændringer</button>
+    <div id="status" class="feedback"></div>
+  </form>
+
+  <form id="upload-form" enctype="multipart/form-data" method="post" action="/vorthold/api/uploadbillede.php">
+    <label for="billede">Upload billede:</label>
+    <input type="file" id="billede" name="billede" accept="image/*" />
+    <button type="submit">Upload billede</button>
+    <div id="upload-status" class="feedback"></div>
+  </form>
+
+  <script>
+    // Hent data fra server
+    fetch('/vorthold/api/getvelkomst.php')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('overskrift').value = data.overskrift || "";
+        document.getElementById('beskrivelse').value = data.beskrivelse || "";
+        document.getElementById('beskrivelse2').value = data.beskrivelse2 || "";
+      
+        document.getElementById('billede_url').value = data.billede_url || "";
+        if (data.billede_url) {
+          document.getElementById('preview').src = data.billede_url;
+        }
+      });
+
+    // Opdater preview ved URL-ændring
+    document.getElementById('billede_url').addEventListener('input', function () {
+      document.getElementById('preview').src = this.value;
+    });
+
+    // Gem ændringer
+    document.getElementById('velkomst-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      document.getElementById('status').textContent = "⏳ Gemmer...";
+
+      const payload = {
+        overskrift: document.getElementById('overskrift').value,
+        beskrivelse: document.getElementById('beskrivelse').value,
+        beskrivelse2: document.getElementById('beskrivelse2').value,
+        billede_url: document.getElementById('billede_url').value,
+      };
+
+      fetch('/vorthold/api/updatevelkomst.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(result => {
+        document.getElementById('status').textContent = result.success
+          ? "✅ Ændringer gemt!"
+          : "❌ Fejl: " + result.message;
+        document.getElementById('status').className = result.success ? "feedback success" : "feedback error";
+      })
+      .catch(err => {
+        document.getElementById('status').textContent = "❌ Fejl ved gemning";
+        document.getElementById('status').className = "feedback error";
+        console.error(err);
+      });
+    });
+
+    // Upload billede og vis preview
+    document.getElementById('upload-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      document.getElementById('upload-status').textContent = "⏳ Uploader billede...";
+
+      fetch(this.action, {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.success && result.url) {
+          document.getElementById('billede_url').value = result.url;
+          document.getElementById('preview').src = result.url;
+          document.getElementById('upload-status').textContent = "✅ Billede uploadet";
+          document.getElementById('upload-status').className = "feedback success";
+        } else {
+          throw new Error(result.message || "Ukendt fejl");
+        }
+      })
+      .catch(err => {
+        document.getElementById('upload-status').textContent = "❌ Upload-fejl: " + err.message;
+        document.getElementById('upload-status').className = "feedback error";
+      });
+    });
+  </script>
+</body>
+</html>
