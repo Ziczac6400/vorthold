@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <title>Registrering – på Pacta Tua</title>
+  <link rel="stylesheet" href="/vorthold/shared/style/main.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+<main>
+<header>
+    <h1 id="site-title">Registrering</h1> 
+</header>
+  <section class="velkomst">
+    <div class="form-container">   
+    <p>Benyt formularen nedenfor til at registrere dig. Alle felter er påkrævet.</p>
+     
+    <form id="registerForm" class="formular">
+        <label for="navn">Fulde navn:</label>
+        <input type="text" id="navn" required />
+
+        <label for="email">E-mail:</label>
+        <input type="email" id="email" required />
+
+        <label for="telefon">Telefon:</label>
+        <input type="tel" id="telefon" pattern="[0-9]{8}" required />
+
+        <label for="kommune">Vælg kommune:</label>
+        <select type="kom" id="kommune" required>
+          <option value="">[Søg med første bogstav]</option>
+        </select>
+        
+        <div style="margin-top: 1em;">
+          <label for="persondata">Gem mine person kontakt data : <br>
+            <input type="checkbox" id="persondata" />
+            Ja, for I overholder EU's GDPR-reglement
+          </label>
+          <p class="note">Ved at registrere dig accepterer du vores 
+             <a href="/vorthold/shared/terms.html" target="_blank">vilkår</a> og 
+             <a href="/vorthold/shared/privacy.html" target="_blank">privatlivspolitik</a>.
+          </p>
+        </div>
+
+        <button type="submit" id="submitBtn" disabled>Registrer</button>
+        <p id="statusbesked" class="besked"></p>
+      </form>
+    </div>
+
+  </section>
+</main>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Aktivér knappen, når persondata er accepteret
+      const persondataCheckbox = document.getElementById('persondata');
+      const submitBtn = document.getElementById('submitBtn');
+
+      persondataCheckbox.addEventListener('change', () => {
+        submitBtn.disabled = !persondataCheckbox.checked;
+      });
+   
+    // Hent kommuner og udfyld dropdown
+    fetch('/vorthold/api/getkommuner.php')
+      .then(res => res.json())
+      .then(kommuner => {
+        const select = document.getElementById('kommune');
+        if (!select) {
+          console.error('Dropdown-feltet "kommune" blev ikke fundet.');
+          return;
+        }
+        kommuner.forEach(k => {
+          const opt = document.createElement('option');
+          opt.value = k.id;
+          opt.textContent = k.navn;
+          select.appendChild(opt);
+        });
+      })
+      .catch(err => {
+        console.error('Fejl ved hentning af kommuner:', err);
+      });
+
+    // Håndter formularindsendelse
+    document.getElementById('registerForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const payload = {
+        navn: document.getElementById('navn').value,
+        email: document.getElementById('email').value,
+        telefon: document.getElementById('telefon').value,
+        kommune: document.getElementById('kommune').value
+      };
+
+      fetch('/vorthold/api/register.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+        .then(async res => {
+          const contentType = res.headers.get('Content-Type');
+          const status = document.getElementById('statusbesked');
+
+          if (res.ok && contentType && contentType.includes('application/json')) {
+            const data = await res.json();
+            if (data.success) {
+              status.textContent = '✅ Du er nu registreret!';
+              status.classList.add('success');
+              if (data.redirect) {
+                setTimeout(() => {
+                  window.location.href = data.redirect;
+                }, 1000); // ← Du kan justere tiden
+              }
+            } else if (data.error) {
+              status.textContent = '❌ ' + data.error;
+              status.classList.add('error');
+            } else {
+              status.textContent = '❌ ' + data.message;
+              status.classList.add('error');
+            }
+          } else {
+            const text = await res.text();
+            console.error('Ugyldigt svar fra serveren:', text);
+            status.textContent = '❌ Der opstod en fejl under registreringen.';
+            status.classList.add('error');
+          }
+        })
+        .catch(err => {
+          console.error('Fejl under registrering:', err);
+          const status = document.getElementById('statusbesked');
+          status.textContent = '❌ Der opstod en fejl. Prøv igen senere.';
+          status.classList.add('error');
+        });
+    });
+  });
+</script>
+
+</body>
+</html>
