@@ -1,11 +1,64 @@
 <!DOCTYPE html>
 <html lang="da">
 <head>
-  <meta charset="UTF-8">
-  <title>VortHold</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pacta Tua</title>
+  <link rel="stylesheet" href="/vorthold/shared/style/main.css" />
 </head>
 <body>
-  <h1>Velkommen til VortHold!</h1>
-  <p>Dette er testversionen af din side hostet via GitHub Pages.</p>
+  <header>
+    <h1 id="site-title">Pacta Tura - Dine aftaler </h1>
+  </header>
+
+  <main>
+  <section class="velkomst">
+    <img id="velkomst-billede" src="" alt="Velkomstbillede" />
+    <div class="tekst">
+      <h2 id="velkomst-overskrift">[Indlæser overskrift...]</h2>
+      <p id="velkomst-beskrivelse">[Indlæser beskrivelse...]</p>
+      <a href="/vorthold/deltager/registrering.html" class="tilmeld-knap">Opret dig her og følg dine aftaler</a>
+      <p id="velkomst-footertekst">[Indlæser beskrivelse...]</p>
+      
+    </div>
+  </section>
+</main>
+
+  <footer>
+    <p>Denne portal er udviklet på frivillg basis og der kan være en fejl vi ikke har<br>
+       opdaget det beklager vi selvfølgelig, skriv til os så vi kan rette problemet, tak.</p> 
+    <p> Kontakt: <span id="support-email">kontakt@ziczac.dk</span></p>
+  </footer>
+
+  <script>
+    // Hent konfiguration fra config.json
+    fetch('/vorthold/shared/config.json')
+      .then(res => res.json())
+      .then(config => {
+        document.getElementById('site-title').textContent = config.siteTitle || 'Pacta Tura';
+        document.getElementById('support-email').textContent = config.supportEmail;
+
+        // Hvis du vil gøre billedet dynamisk:
+       // document.getElementById('velkomst-billede').src = config.welcomeImageUrl;
+      });
+  </script>
+
+  <script>
+  fetch('/vorthold/api/getvelkomst.php')
+    .then(response => response.json())
+    .then(data => {
+
+      // Udskift hardkodede elementer med data fra databasen
+      document.getElementById('velkomst-overskrift').innerHTML = data.overskrift.replace(/\n/g, '<br>');
+      document.getElementById('velkomst-beskrivelse').innerHTML = data.beskrivelse.replace(/\n/g, '<br>');
+      document.getElementById('velkomst-footertekst').innerHTML = data.beskrivelse2.replace(/\n/g, '<br>');
+     // pga. linjeskift:  document.getElementById('velkomst-beskrivelse').textContent = data.beskrivelse;
+      document.getElementById('velkomst-billede').src = data.billede_url;
+    })
+    .catch(error => {
+      console.error("Fejl ved hentning af velkomstdata:", error);
+    });
+  </script>
+
 </body>
 </html>
