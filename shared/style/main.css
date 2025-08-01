@@ -5,14 +5,6 @@ body {
   background: #f4f4f4;
 }
 
-  
-header, footer {
-  background: #004466;
-  color: white;
-  padding: 1rem;
-  text-align: center;
-}
-
 .velkomst {
   display: flex;
   flex-direction: column;
@@ -47,11 +39,25 @@ header, footer {
 .tilmeld-knap:hover {
   background: #34a300;
 }
-  label {
+
+/* ====== Main content ====== */
+main {
+    padding: 1rem;
+}
+
+/* ====== Beskrivelse ====== */
+.description {
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+label {
     display: block;
     margin: 1em 0 0.4em;
     font-weight: 600;
   }
+
+
   input[type="text"],
   textarea,
   Input[type="file"] {
@@ -75,7 +81,7 @@ header, footer {
     border-radius: 4px;
   }
   button:hover {
-    background-color: #2b9900;
+    background-color: #9dc98c;
   }
   #preview {
     margin-top: 0.8em;
@@ -169,7 +175,7 @@ header, footer {
 }
 
 /* ====== Responsiv visning ====== */
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 400px) {
   .form-container {
     margin: 2em 1em;
     padding: 1.5em;
@@ -181,5 +187,119 @@ header, footer {
 }
 input:invalid {
   border-color: #cc0000;
+}
+/* ====== Tabel-sektioner ====== */
+.table-section {
+    margin-bottom: 2rem;
+}
+
+.table-section h2 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+/* ====== Tabeller ====== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+    text-align: left;
+}
+
+th {
+    background-color: #eee;
+}
+
+header {
+  display: flex;
+  justify-content: space-between; /* Placerer titel til venstre, login til højre */
+  align-items: center;            /* Centrerer indhold vertikalt i headeren */
+  padding: 12px 16px;             /* Giver luft indeni */
+  background-color: #004466;      /* Samlet farve */
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+footer {
+  background: #004466;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+}
+
+
+#site-title {
+  font-size: 28px;
+  margin: 0;
+  color: #fcfafa;
+  text-align: center;
+}
+
+.login-knap {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* afstand mellem ikon og tekst */
+  padding: 4px 12px;
+  font-size: 14px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  
+}
+
+.login-knap img {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+.login-knap:hover {
+  background-color: #80acdb;
+}
+
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 10;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.6);
+}
+
+.modal-content {
+  background-color: #ccdaeb;
+  margin: 10% auto;
+  padding: 20px 30px;
+  border-radius: 8px;
+  width: 300px;
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  font-size: 1.5em;
+  cursor: pointer;
+}
+
+.feedback {
+  margin-top: 10px;
+  color: red;
+}
+#loginModal {
+  display: none;
 }
 
