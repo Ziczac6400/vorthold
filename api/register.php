@@ -1,4 +1,6 @@
 <?php
+session_start(); // ⭐ Start session
+
 header('Content-Type: application/json');
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
@@ -18,7 +20,6 @@ if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
 }
 
 try {
-  // ✅ Tjek om e-mail allerede findes og hent navn
   $checkStmt = $pdo->prepare("SELECT navn FROM deltagere WHERE email = ?");
   $checkStmt->execute([$data['email']]);
   $existingName = $checkStmt->fetchColumn();
@@ -40,20 +41,17 @@ try {
     $data['navn'], $data['email'], $data['telefon'], $data['kommune']
   ]);
 
-// ⭐ (7) Hent ID på nyoprettet deltager
+  // ⭐ Hent ID og gem det i session
   $id = $pdo->lastInsertId();
+  $_SESSION['bruger_id'] = $id;
 
-  // ⭐ (8) Redirect til tak-siden med ID
-  $id = $pdo->lastInsertId();
-
+  // ✅ Svar med redirect-link
   echo json_encode([
     'success' => true,
     'redirect' => "/vorthold/deltager/takfortilmelding.php?id=$id"
   ]);
   exit;
 
-
-  echo json_encode(['success' => true]);
 } catch (PDOException $e) {
   echo json_encode(['success' => false, 'message' => 'Databasefejl: ' . $e->getMessage()]);
 }
